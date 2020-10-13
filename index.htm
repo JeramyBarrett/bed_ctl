@@ -14,8 +14,8 @@ div {
 
 <table>
 <tr>
-  <td><div>Head</div></td>
-  <td><div>Foot</div></td>
+  <td style="text-align:center"><div>Head</div></td>
+  <td style="text-align:center"><div>Foot</div></td>
 </tr>
 
 <tr>
@@ -24,8 +24,8 @@ div {
 </tr>
 
 <tr>
-  <td><div>Number</div></td>
-  <td><div>Number</div></td>
+  <td><div><iframe id="headPosition" src="/headPos"></iframe></div></td>
+  <td><div><iframe id="footPosition" src="/footPos"></iframe></div></td>
 </tr>
 
 <tr>
@@ -40,6 +40,8 @@ const headUp = document.getElementById('headUp');
 const headDown = document.getElementById('headDown');
 const footUp = document.getElementById('footUp');
 const footDown = document.getElementById('footDown');
+const headPosition = document.getElementById('headPosition');
+const footPosition = document.getElementById('footPosition');
 
 headUp.addEventListener('touchstart', e => {
   var i = document.createElement("img");
@@ -49,6 +51,7 @@ headUp.addEventListener('touchstart', e => {
 headUp.addEventListener('touchend', e => {
   var i = document.createElement("img");
   i.src = "/headUpOff";
+  document.getElementById('headPosition').contentWindow.location.reload();
 });
 
 headDown.addEventListener('touchstart', e => {
@@ -59,6 +62,7 @@ headDown.addEventListener('touchstart', e => {
 headDown.addEventListener('touchend', e => {
   var i = document.createElement("img");
   i.src = "/headDownOff";
+  document.getElementById('headPosition').contentWindow.location.reload();
 });
 
 footUp.addEventListener('touchstart', e => {
@@ -69,6 +73,7 @@ footUp.addEventListener('touchstart', e => {
 footUp.addEventListener('touchend', e => {
   var i = document.createElement("img");
   i.src = "/footUpOff";
+  document.getElementById('footPosition').contentWindow.location.reload();
 });
 
 footDown.addEventListener('touchstart', e => {
@@ -79,6 +84,7 @@ footDown.addEventListener('touchstart', e => {
 footDown.addEventListener('touchend', e => {
   var i = document.createElement("img");
   i.src = "/footDownOff";
+  document.getElementById('footPosition').contentWindow.location.reload();
 });
 
 </script>
