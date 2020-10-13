@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+div {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+</style>
+</head>
+
+<body>
+
+<table>
+<tr>
+<td><div>Head</div></td>
+<td><div>Foot</div></td>
+</tr>
+
+<tr>
+<td><canvas id="headUp" width="400" height="400" style="border:1px solid #000000;"/td>
+<td><canvas id="footUp" width="400" height="400" style="border:1px solid #000000;"</td>
+</tr>
+
+<tr>
+<td><div>Number</div></td>
+<td><div>Number</div></td>
+</tr>
+
+<tr>
+<td><canvas id="headDown" width="400" height="400" style="border:1px solid #000000;"</td>
+<td><canvas id="footDown" width="400" height="400" style="border:1px solid #000000;"</td>
+</tr>
+</table>
+
+<script>
+
+const headUp = document.getElementById('headUp');
+const headDown = document.getElementById('headDown');
+const footUp = document.getElementById('footUp');
+const footDown = document.getElementById('footDown');
+
+headUp.addEventListener('touchstart', e => {
+  var i = document.createElement("img");
+  i.src = "/headUpEn";
+});
+
+headUp.addEventListener('touchend', e => {
+  var i = document.createElement("img");
+  i.src = "/headUpDis";
+});
+
+</script>
+<noscript>Your browser does not support JavaScript</noscript>
+
+</body>
+</html>
+
