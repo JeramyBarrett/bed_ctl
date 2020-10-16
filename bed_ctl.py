@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from bottle import route, run, template, static_file
+from bottle import route, run, static_file, template
 from gpiozero import DigitalOutputDevice, DigitalInputDevice
 from enum import Enum
 
@@ -106,27 +106,31 @@ def footDownOff():
     footDownGPIO_B.off()
     return
 
+positionFormat = "<p style=\"text-align: center; font-size: xx-large\">{{val}}</p>"
+
 @route('/headPos')
 def headPos():
-    return str(headPosVal)
+    global positionFormat
+    return template(positionFormat, val=headPosVal)
 
 @route('/footPos')
 def footPos():
-    return str(footPosVal)
+    global positionFormat
+    return template(positionFormat, val=footPosVal)
 
 def headPosChange(self):
     global headPosVal, headState
 
     if headState == buttonState.up:
         headPosVal += 1
-    elif headState == buttonState.down:
+    elif (headState == buttonState.down) & (headPosVal > 0):
         headPosVal -= 1
 
 def footPosChange(self):
     global footPosVal, footState
     if footState == buttonState.up:
         footPosVal += 1
-    elif footState == buttonState.down:
+    elif (footState == buttonState.down) & (footPosVal > 0):
         footPosVal -= 1
 
 
@@ -147,4 +151,4 @@ footPosIn = DigitalInputDevice(15, pull_up=True)
 headPosIn.when_activated = headPosChange
 footPosIn.when_activated = footPosChange
 
-run(host='0.0.0.0', port=80)
+run(host='0.0.0.0', port=80, debug=False)

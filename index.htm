@@ -2,94 +2,151 @@
 <html>
 <head>
 <style>
-div {
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
+  div {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    height: 100vh;
+    background-color: slategrey;
+  }
+
+  canvas {
+    border:1px solid black;
+    width: 39%;
+    height: 20%;
+    background-color: gray;
+    margin: 5%;
+  }
+
+  iframe {
+    width: 39%;
+    height: 5%;
+    background-color: gray;
+    margin: 5%;
+    overflow: hidden;
+  }
 </style>
 </head>
 
 <body>
-
-<table>
-<tr>
-  <td style="text-align:center"><div>Head</div></td>
-  <td style="text-align:center"><div>Foot</div></td>
-</tr>
-
-<tr>
-  <td><canvas id="headUp" width="400" height="400" style="border:1px solid #000000;"/td>
-  <td><canvas id="footUp" width="400" height="400" style="border:1px solid #000000;"</td>
-</tr>
-
-<tr>
-  <td><div><iframe id="headPosition" src="/headPos"></iframe></div></td>
-  <td><div><iframe id="footPosition" src="/footPos"></iframe></div></td>
-</tr>
-
-<tr>
-  <td><canvas id="headDown" width="400" height="400" style="border:1px solid #000000;"</td>
-  <td><canvas id="footDown" width="400" height="400" style="border:1px solid #000000;"</td>
-</tr>
-</table>
+<div>
+  <iframe id="headPosition" src="/headPos"></iframe><iframe id="footPosition" src="/footPos"></iframe>
+  <canvas id="headUp"></canvas><canvas id="footUp"></canvas>
+  <canvas id="headDown"></canvas><canvas id="footDown"></canvas>
+  <canvas id="allDown" style="width: 90%;"></canvas>
+</div>
+</body>
 
 <script>
+  const headUp = document.getElementById('headUp');
+  const headDown = document.getElementById('headDown');
+  const footUp = document.getElementById('footUp');
+  const footDown = document.getElementById('footDown');
+  const headPosition = document.getElementById('headPosition');
+  const footPosition = document.getElementById('footPosition');
+  const allDown = document.getElementById('allDown');
 
-const headUp = document.getElementById('headUp');
-const headDown = document.getElementById('headDown');
-const footUp = document.getElementById('footUp');
-const footDown = document.getElementById('footDown');
-const headPosition = document.getElementById('headPosition');
-const footPosition = document.getElementById('footPosition');
+  // Button text
+  const headUpText = 'Head Up';
+  const headDownText = 'Head Down';
+  const footUpText = 'Foot Up';
+  const footDownText = 'Foot Down';
+  const allDownText = 'All Down'
 
-headUp.addEventListener('touchstart', e => {
-  var i = document.createElement("img");
-  i.src = "/headUpOn";
-});
+  // Buttons need to be redrawn everytime they are pressed. Uses these functions
+  // to redraw the buttons.
+  function drawButton(element, text, color) {
+    ctx = element.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, element.width, element.height);
+    ctx.fillStyle = 'black';
+    ctx.font = '30px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, element.width/2, element.height/2);
+  }
 
-headUp.addEventListener('touchend', e => {
-  var i = document.createElement("img");
-  i.src = "/headUpOff";
-  document.getElementById('headPosition').contentWindow.location.reload();
-});
+  function buttonUp(element, text) {
+    drawButton(element, text, 'gray')
+  }
 
-headDown.addEventListener('touchstart', e => {
-  var i = document.createElement("img");
-  i.src = "/headDownOn";
-});
+  function buttonDown(element, text) {
+    drawButton(element, text, 'dimgrey')
+  }
 
-headDown.addEventListener('touchend', e => {
-  var i = document.createElement("img");
-  i.src = "/headDownOff";
-  document.getElementById('headPosition').contentWindow.location.reload();
-});
+  // Button event listeners to react to touch events
+  headUp.addEventListener('touchstart', e => {
+    var i = document.createElement("img");
+    i.src = "/headUpOn";
+    buttonDown(headUp, headUpText);
+  });
 
-footUp.addEventListener('touchstart', e => {
-  var i = document.createElement("img");
-  i.src = "/footUpOn";
-});
+  headUp.addEventListener('touchend', e => {
+    var i = document.createElement("img");
+    i.src = "/headUpOff";
+    document.getElementById('headPosition').contentWindow.location.reload();
+    buttonUp(headUp, headUpText);
+  });
 
-footUp.addEventListener('touchend', e => {
-  var i = document.createElement("img");
-  i.src = "/footUpOff";
-  document.getElementById('footPosition').contentWindow.location.reload();
-});
+  headDown.addEventListener('touchstart', e => {
+    var i = document.createElement("img");
+    i.src = "/headDownOn";
+    buttonDown(headDown, headDownText);
+  });
 
-footDown.addEventListener('touchstart', e => {
-  var i = document.createElement("img");
-  i.src = "/footDownOn";
-});
+  headDown.addEventListener('touchend', e => {
+    var i = document.createElement("img");
+    i.src = "/headDownOff";
+    document.getElementById('headPosition').contentWindow.location.reload();
+    buttonUp(headDown, headDownText);
+  });
 
-footDown.addEventListener('touchend', e => {
-  var i = document.createElement("img");
-  i.src = "/footDownOff";
-  document.getElementById('footPosition').contentWindow.location.reload();
-});
+  footUp.addEventListener('touchstart', e => {
+    var i = document.createElement("img");
+    i.src = "/footUpOn";
+    buttonDown(footUp, footUpText);
+  });
+
+  footUp.addEventListener('touchend', e => {
+    var i = document.createElement("img");
+    i.src = "/footUpOff";
+    document.getElementById('footPosition').contentWindow.location.reload();
+    buttonUp(footUp, footUpText);
+  });
+
+  footDown.addEventListener('touchstart', e => {
+    var i = document.createElement("img");
+    i.src = "/footDownOn";
+    buttonDown(footDown, footDownText);
+  });
+
+  footDown.addEventListener('touchend', e => {
+    var i = document.createElement("img");
+    i.src = "/footDownOff";
+    document.getElementById('footPosition').contentWindow.location.reload();
+    buttonUp(footDown, footDownText);
+  });
+
+  allDown.addEventListener('touchstart', e => {
+    var i = document.createElement("img");
+    i.src = "/allDown";
+    buttonDown(allDown, allDownText);
+  });
+
+  allDown.addEventListener('touchend', e => {
+    document.getElementById('footPosition').contentWindow.location.reload();
+    buttonUp(allDown, allDownText);
+  });
+
+  // Initial drawing of buttons
+  buttonUp(headUp, headUpText);
+  buttonUp(headDown, headDownText);
+  buttonUp(footUp, footUpText);
+  buttonUp(footDown, footDownText);
+  buttonUp(allDown, allDownText);
+  
 
 </script>
 <noscript>Your browser does not support JavaScript</noscript>
 
-</body>
 </html>
 
