@@ -3,152 +3,168 @@
 from bottle import route, run, static_file, template
 from gpiozero import DigitalOutputDevice, DigitalInputDevice
 from enum import Enum
+from threading import Thread
+from time import sleep
 
-class buttonState(Enum):
-    up = 1
-    down = 2
-    none = 3
+class motorCtl:
+    class state(Enum):
+        movingUp = 1
+        movingDown = 2
+        idle = 3
 
-headPosVal = 0
-footPosVal = 0
-headState = buttonState.none
-footState = buttonState.none
+    def __init__(self, pinUp, pinDown, pinPosition):
+        self._moveUp = DigitalOutputDevice(pinUp)
+        self._moveDown = DigitalOutputDevice(pinDown)
+        positionInput = DigitalInputDevice(pinPosition, pull_up=True)
+        positionInput.when_activated = self._positionEdge
+
+        self._moveUp.off()
+        self._moveDown.off()
+
+        self._inMotion = False
+        self._edgeDetected = False
+        self._position = 0
+        self._state = self.state.idle
+
+        self._motionDetectThread = Thread(target=self._motionDetect, args=())
+        self._motionDetectThread.daemon = True
+        self._motionDetectThread.start()
+
+    def __del__(self):
+        pass
+
+    def upStart(self):
+        if self._state != self.state.idle:
+            return
+        
+        self._state = self.state.movingUp
+        self._moveUp.on()
+
+    def upStop(self):
+        if self._state != self.state.movingUp:
+            return
+
+        self._state = self.state.idle
+        self._moveUp.off()
+
+    def downStart(self):
+        if self._state != self.state.idle:
+            return
+        
+        self._state = self.state.movingDown
+        self._moveDown.on()
+
+    def downStop(self):
+        if self._state != self.state.movingDown:
+            return
+
+        self._state = self.state.idle
+        self._moveDown.off()
+
+    def getPosition(self):
+        return self._position
+
+    def _motionDetect(self):
+        while True:
+            # Still in motion
+            if self._inMotion == True & self._edgeDetected == True:
+                self._edgeDetected = False
+
+            # Just started moving
+            elif self._inMotion == False & self._edgeDetected == True:
+                self._inMotion = True
+                self._edgeDetected = False
+
+            # Stopped moving
+            elif self._inMotion == True & self._edgeDetected == False:
+                self._inMotion = False
+
+            sleep(0.5)
+
+    def _positionEdge(self):
+        print("Edge Detected")
+        if self._state == self.state.movingUp:
+            self._position += 1
+        elif self._state == self.state.movingDown & self._position > 0:
+            self._position -= 1
+
+        self._edgeDetected = True
+        self._inMotion = True
+
+    def inMotion(self):
+        return self._inMotion
+
 
 @route('/')
 def index():
     return static_file('index.htm', root='/home/pi/bed_ctl')
 
-@route('/headUpOn')
-def headUpOn():
-    global headState
-    if headState != buttonState.none:
-        return
-    
-    headState = buttonState.up
-    headUpGPIO_A.on()
-    headUpGPIO_B.on()
+@route('/headUpStart')
+def headUpStart():
+    rightHead.upStart()
+    leftHead.upStart()
     return
 
-@route('/headUpOff')
-def headUpOff():
-    global headState
-    if headState != buttonState.up:
-        return
-
-    headState = buttonState.none
-    headUpGPIO_A.off()
-    headUpGPIO_B.off()
+@route('/headUpStop')
+def headUpStop():
+    rightHead.upStop()
+    leftHead.upStop()
     return
 
-@route('/headDownOn')
-def headDownOn():
-    global headState
-    if headState != buttonState.none:
-        return
-
-    headState = buttonState.down
-    headDownGPIO_A.on()
-    headDownGPIO_B.on()
+@route('/headDownStart')
+def headDownStart():
+    rightHead.downStart()
+    leftHead.downStart()
     return
 
-@route('/headDownOff')
-def headDownOff():
-    global headState
-    if headState != buttonState.down:
-        return
-
-    headState = buttonState.none
-    headDownGPIO_A.off()
-    headDownGPIO_B.off()
+@route('/headDownStop')
+def headDownStop():
+    rightHead.downStop()
+    leftHead.downStop()
     return
 
-@route('/footUpOn')
-def footUpOn():
-    global footState
-    if footState != buttonState.none:
-        return
-
-    footState = buttonState.up
-    footUpGPIO_A.on()
-    footUpGPIO_B.on()
+@route('/footUpStart')
+def footUpStart():
+    rightFoot.upStart()
+    leftFoot.upStart()
     return
 
-@route('/footUpOff')
-def footUpOff():
-    global footState
-    if footState != buttonState.up:
-        return
-
-    footState = buttonState.none
-    footUpGPIO_A.off()
-    footUpGPIO_B.off()
+@route('/footUpStop')
+def footUpStop():
+    rightFoot.upStop()
+    leftFoot.upStop()
     return
 
-@route('/footDownOn')
-def footDownOn():
-    global footState
-    if footState != buttonState.none:
-        return
-
-    footState = buttonState.down
-    footDownGPIO_A.on()
-    footDownGPIO_B.on()
+@route('/footDownStart')
+def footDownStart():
+    rightFoot.downStart()
+    leftFoot.downStart()
     return
 
-@route('/footDownOff')
-def footDownOff():
-    global footState
-    if footState != buttonState.down:
-        return
-
-    footState = buttonState.none
-    footDownGPIO_A.off()
-    footDownGPIO_B.off()
+@route('/footDownStop')
+def footDownStop():
+    rightFoot.downStop()
+    leftFoot.downStop()
     return
 
 positionFormat = "<p style=\"text-align: center; font-size: xx-large\">{{val}}</p>"
 
 @route('/headPos')
 def headPos():
-    global positionFormat
-    return template(positionFormat, val=headPosVal)
+    return template(positionFormat, val=rightHead.getPosition())
 
 @route('/footPos')
 def footPos():
-    global positionFormat
-    return template(positionFormat, val=footPosVal)
+    return template(positionFormat, val=rightFoot.getPosition())
 
-def headPosChange(self):
-    global headPosVal, headState
-
-    if headState == buttonState.up:
-        headPosVal += 1
-    elif (headState == buttonState.down) & (headPosVal > 0):
-        headPosVal -= 1
-
-def footPosChange(self):
-    global footPosVal, footState
-    if footState == buttonState.up:
-        footPosVal += 1
-    elif (footState == buttonState.down) & (footPosVal > 0):
-        footPosVal -= 1
-
-
-
-headUpGPIO_A = DigitalOutputDevice(17)
-headDownGPIO_A = DigitalOutputDevice(27)
-footUpGPIO_A = DigitalOutputDevice(4)
-footDownGPIO_A = DigitalOutputDevice(18)
-
-headUpGPIO_B = DigitalOutputDevice(6)
-headDownGPIO_B = DigitalOutputDevice(16)
-footUpGPIO_B = DigitalOutputDevice(8)
-footDownGPIO_B = DigitalOutputDevice(12)
-
-headPosIn = DigitalInputDevice(14, pull_up=True)
-footPosIn = DigitalInputDevice(15, pull_up=True)
-
-headPosIn.when_activated = headPosChange
-footPosIn.when_activated = footPosChange
+leftHead = motorCtl(17, 27, 14)
+leftFoot = motorCtl(4, 18, 15)
+rightHead = motorCtl(6, 16, 7)
+rightFoot = motorCtl(8, 12, 5)
 
 run(host='0.0.0.0', port=80, debug=False)
+
+del leftHead
+del leftFoot
+del rightHead
+del rightFoot

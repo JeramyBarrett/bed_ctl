@@ -7,6 +7,7 @@
     -ms-user-select: none;
     user-select: none;
     height: 100vh;
+    width: 100vw;
     background-color: slategrey;
   }
 
@@ -38,12 +39,12 @@
 </body>
 
 <script>
+  const headPosition = document.getElementById('headPosition');
+  const footPosition = document.getElementById('footPosition');
   const headUp = document.getElementById('headUp');
   const headDown = document.getElementById('headDown');
   const footUp = document.getElementById('footUp');
   const footDown = document.getElementById('footDown');
-  const headPosition = document.getElementById('headPosition');
-  const footPosition = document.getElementById('footPosition');
   const allDown = document.getElementById('allDown');
 
   // Button text
@@ -73,68 +74,64 @@
     drawButton(element, text, 'dimgrey')
   }
 
+  function getRequest(url) {
+    var i = document.createElement('img');
+    i.src = url;
+  }
+
   // Button event listeners to react to touch events
   headUp.addEventListener('touchstart', e => {
-    var i = document.createElement("img");
-    i.src = "/headUpOn";
+    getRequest('/headUpStart')
     buttonDown(headUp, headUpText);
   });
 
   headUp.addEventListener('touchend', e => {
-    var i = document.createElement("img");
-    i.src = "/headUpOff";
-    document.getElementById('headPosition').contentWindow.location.reload();
+    getRequest('/headUpStop')
     buttonUp(headUp, headUpText);
+    document.getElementById('headPosition').contentWindow.location.reload();
   });
 
   headDown.addEventListener('touchstart', e => {
-    var i = document.createElement("img");
-    i.src = "/headDownOn";
+    getRequest('/headDownStart')
     buttonDown(headDown, headDownText);
   });
 
   headDown.addEventListener('touchend', e => {
-    var i = document.createElement("img");
-    i.src = "/headDownOff";
-    document.getElementById('headPosition').contentWindow.location.reload();
+    getRequest('/headDownStop')
     buttonUp(headDown, headDownText);
+    document.getElementById('headPosition').contentWindow.location.reload();
   });
 
   footUp.addEventListener('touchstart', e => {
-    var i = document.createElement("img");
-    i.src = "/footUpOn";
+    getRequest('/footUpStart')
     buttonDown(footUp, footUpText);
   });
 
   footUp.addEventListener('touchend', e => {
-    var i = document.createElement("img");
-    i.src = "/footUpOff";
-    document.getElementById('footPosition').contentWindow.location.reload();
+    getRequest('/footUpStop')
     buttonUp(footUp, footUpText);
+    document.getElementById('footPosition').contentWindow.location.reload();
   });
 
   footDown.addEventListener('touchstart', e => {
-    var i = document.createElement("img");
-    i.src = "/footDownOn";
+    getRequest('/footDownStart')
     buttonDown(footDown, footDownText);
   });
 
   footDown.addEventListener('touchend', e => {
-    var i = document.createElement("img");
-    i.src = "/footDownOff";
-    document.getElementById('footPosition').contentWindow.location.reload();
+    getRequest('/footDownStop')
     buttonUp(footDown, footDownText);
+    document.getElementById('footPosition').contentWindow.location.reload();
   });
 
   allDown.addEventListener('touchstart', e => {
-    var i = document.createElement("img");
-    i.src = "/allDown";
+    getRequest('/allDownRun')
     buttonDown(allDown, allDownText);
   });
 
   allDown.addEventListener('touchend', e => {
-    document.getElementById('footPosition').contentWindow.location.reload();
     buttonUp(allDown, allDownText);
+    document.getElementById('footPosition').contentWindow.location.reload();
   });
 
   // Initial drawing of buttons
