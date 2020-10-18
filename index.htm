@@ -131,6 +131,7 @@
 
   allDown.addEventListener('touchend', e => {
     buttonUp(allDown, allDownText);
+    document.getElementById('headPosition').contentWindow.location.reload();
     document.getElementById('footPosition').contentWindow.location.reload();
   });
 
