@@ -79,6 +79,11 @@
     i.src = url;
   }
 
+  function updatePosition() {
+    document.getElementById('headPosition').contentWindow.location.reload();
+    document.getElementById('footPosition').contentWindow.location.reload();
+  }
+
   // Button event listeners to react to touch events
   headUp.addEventListener('touchstart', e => {
     getRequest('/headUpStart')
@@ -88,7 +93,7 @@
   headUp.addEventListener('touchend', e => {
     getRequest('/headUpStop')
     buttonUp(headUp, headUpText);
-    document.getElementById('headPosition').contentWindow.location.reload();
+    // updatePosition();
   });
 
   headDown.addEventListener('touchstart', e => {
@@ -99,7 +104,7 @@
   headDown.addEventListener('touchend', e => {
     getRequest('/headDownStop')
     buttonUp(headDown, headDownText);
-    document.getElementById('headPosition').contentWindow.location.reload();
+    // updatePosition();
   });
 
   footUp.addEventListener('touchstart', e => {
@@ -110,7 +115,7 @@
   footUp.addEventListener('touchend', e => {
     getRequest('/footUpStop')
     buttonUp(footUp, footUpText);
-    document.getElementById('footPosition').contentWindow.location.reload();
+    // updatePosition();
   });
 
   footDown.addEventListener('touchstart', e => {
@@ -121,7 +126,7 @@
   footDown.addEventListener('touchend', e => {
     getRequest('/footDownStop')
     buttonUp(footDown, footDownText);
-    document.getElementById('footPosition').contentWindow.location.reload();
+    // updatePosition();
   });
 
   allDown.addEventListener('touchstart', e => {
@@ -131,8 +136,7 @@
 
   allDown.addEventListener('touchend', e => {
     buttonUp(allDown, allDownText);
-    document.getElementById('headPosition').contentWindow.location.reload();
-    document.getElementById('footPosition').contentWindow.location.reload();
+    // updatePosition();
   });
 
   // Initial drawing of buttons
@@ -141,6 +145,8 @@
   buttonUp(footUp, footUpText);
   buttonUp(footDown, footDownText);
   buttonUp(allDown, allDownText);
+
+  setInterval(updatePosition, 1000);
   
 
 </script>

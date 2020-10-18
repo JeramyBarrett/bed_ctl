@@ -7,7 +7,7 @@ from threading import Thread
 from time import sleep
 
 class motorCtl:
-    class buttonState(Enum):
+    class commandState(Enum):
         up = 1
         down = 2
         idle = 3
@@ -20,14 +20,13 @@ class motorCtl:
 
     def __init__(self, pinUp, pinDown, pinEncoder):
         self._encoderPosition = 0
-        self._buttonState = self.buttonState.idle
+        self._commandState = self.commandState.idle
         self._motorState = self.motorState.idle
 
         # __io = DigitalInputDevice(pinEncoder, pull_up=True)
         # __io.when_activated = self._encoderEdge
         self._moveUp = DigitalOutputDevice(pinUp)
         self._moveDown = DigitalOutputDevice(pinDown)
-
         self._moveUp.off()
         self._moveDown.off()
 
@@ -39,33 +38,41 @@ class motorCtl:
         pass
 
     def upStart(self):
-        if self._buttonState != self.buttonState.idle:
+        if self._commandState != self.commandState.idle:
             return
+
+        # print("upStart")
         
-        self._buttonState = self.buttonState.up
+        self._commandState = self.commandState.up
         self._moveUp.on()
         self._motorState = self.motorState.buttonInput
 
     def upStop(self):
-        if self._buttonState != self.buttonState.up:
+        if self._commandState != self.commandState.up:
             return
 
-        self._buttonState = self.buttonState.idle
+        # print("upStop")
+
+        self._commandState = self.commandState.idle
         self._moveUp.off()
 
     def downStart(self):
-        if self._buttonState != self.buttonState.idle:
+        if self._commandState != self.commandState.idle:
             return
+
+        # print("downStart")
         
-        self._buttonState = self.buttonState.down
+        self._commandState = self.commandState.down
         self._moveDown.on()
         self._motorState = self.motorState.buttonInput
 
     def downStop(self):
-        if self._buttonState != self.buttonState.down:
+        if self._commandState != self.commandState.down:
             return
 
-        self._buttonState = self.buttonState.idle
+        # print("downStop")
+
+        self._commandState = self.commandState.idle
         self._moveDown.off()
 
     def getPosition(self):
@@ -80,11 +87,12 @@ class motorCtl:
                 self._motorState = self.motorState.awatingEdge
 
             elif self._motorState == self.motorState.awatingEdge:
-                if self._buttonState == self.buttonState.down:
+                if self._commandState == self.commandState.down:
                     print("Down Stopped")
                     self.downStop()
+                    self._encoderPosition = 0
 
-                if self._buttonState == self.buttonState.up:
+                if self._commandState == self.commandState.up:
                     print("Up Stopped")
                     self.upStop()
 
@@ -96,9 +104,10 @@ class motorCtl:
             sleep(1)
 
     def _encoderEdge(self):
-        if self._buttonState == self.buttonState.up:
+        # print("Edge")
+        if self._commandState == self.commandState.up:
             self._encoderPosition += 1
-        elif (self._buttonState == self.buttonState.down) & (self._encoderPosition > 0):
+        elif (self._commandState == self.commandState.down) & (self._encoderPosition > 0):
             self._encoderPosition -= 1
 
         self._motorState = self.motorState.edge
